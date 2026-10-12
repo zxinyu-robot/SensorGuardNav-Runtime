@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sensor-guard-nav"
+version = "0.1.0"
+description = "LiDAR contamination-aware localization safety runtime"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "SensorGuard-NAV contributors" }]
+dependencies = ["numpy>=1.26,<3"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9", "ruff>=0.7,<1"]
+
+[project.scripts]
+sensor-guard-nav = "sensor_guard_nav.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sensor_guard_nav"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
