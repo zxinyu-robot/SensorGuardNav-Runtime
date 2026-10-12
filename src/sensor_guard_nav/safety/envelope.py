@@ -18,6 +18,25 @@ class SafetyEnvelopeConfig:
     degraded_time_limit_s: float = 8.0
     minimum_command_speed_mps: float = 0.05
 
+    def __post_init__(self) -> None:
+        values = (
+            self.nominal_speed_mps,
+            self.dead_reckoning_speed_mps,
+            self.uncertainty_stop_m,
+            self.minimum_fov_fraction,
+            self.obstacle_margin_m,
+            self.degraded_time_limit_s,
+            self.minimum_command_speed_mps,
+        )
+        if not all(math.isfinite(value) and value >= 0 for value in values):
+            raise ValueError("safety configuration must be finite and non-negative")
+        if self.nominal_speed_mps <= 0 or self.uncertainty_stop_m <= 0:
+            raise ValueError("nominal speed and uncertainty stop threshold must be positive")
+        if not 0 <= self.minimum_fov_fraction <= 1:
+            raise ValueError("minimum_fov_fraction must be in [0, 1]")
+        if self.dead_reckoning_speed_mps > self.nominal_speed_mps:
+            raise ValueError("dead reckoning speed cannot exceed nominal speed")
+
 
 def _validate(context: SafetyContext) -> None:
     values = (
@@ -81,9 +100,7 @@ def compute_safety_envelope(
         reasons.append("dead reckoning speed cap")
     if context.nearest_obstacle_m is not None:
         clearance = (
-            context.nearest_obstacle_m
-            - cfg.obstacle_margin_m
-            - context.localization_uncertainty_m
+            context.nearest_obstacle_m - cfg.obstacle_margin_m - context.localization_uncertainty_m
         )
         speed = min(
             speed,

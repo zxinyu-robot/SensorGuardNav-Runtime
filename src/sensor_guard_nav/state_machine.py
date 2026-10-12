@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 from sensor_guard_nav.contracts import (
@@ -17,6 +18,15 @@ class StateMachineConfig:
     degraded_timeout_s: float = 8.0
     local_recovery_settle_s: float = 1.0
     global_recovery_timeout_s: float = 10.0
+
+    def __post_init__(self) -> None:
+        values = (
+            self.degraded_timeout_s,
+            self.local_recovery_settle_s,
+            self.global_recovery_timeout_s,
+        )
+        if not all(math.isfinite(value) and value > 0 for value in values):
+            raise ValueError("state-machine timeouts must be finite and positive")
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,6 +95,8 @@ class NavigationStateMachine:
         reason: str,
         evidence: tuple[str, ...] = (),
     ) -> Transition:
+        if not math.isfinite(timestamp_s) or timestamp_s < self.entered_at_s:
+            raise ValueError("transition timestamp must be finite and monotonic")
         if target == self.mode:
             return Transition(self.mode, self.mode, timestamp_s, reason, evidence)
         if target not in _ALLOWED[self.mode]:
@@ -133,14 +145,18 @@ class NavigationStateMachine:
                 )
                 reason = "sensor regressed during local recovery"
             elif recovery is RecoveryAction.GLOBAL:
-                target, reason = NavigationMode.RECOVERING_GLOBAL, "local alignment remained ambiguous"
+                target = NavigationMode.RECOVERING_GLOBAL
+                reason = "local alignment remained ambiguous"
             elif recovery is RecoveryAction.MANUAL:
-                target, reason = NavigationMode.MANUAL_REQUIRED, "recovery ambiguity requires operator"
+                target = NavigationMode.MANUAL_REQUIRED
+                reason = "recovery ambiguity requires operator"
             elif elapsed >= self.config.local_recovery_settle_s:
                 target, reason = NavigationMode.HEALTHY, "local alignment remained stable"
         elif self.mode is NavigationMode.RECOVERING_GLOBAL:
-            if recovery is RecoveryAction.MANUAL or elapsed >= self.config.global_recovery_timeout_s:
-                target, reason = NavigationMode.MANUAL_REQUIRED, "global recovery failed or timed out"
+            timed_out = elapsed >= self.config.global_recovery_timeout_s
+            if recovery is RecoveryAction.MANUAL or timed_out:
+                target = NavigationMode.MANUAL_REQUIRED
+                reason = "global recovery failed or timed out"
             elif health.healthy and recovery is RecoveryAction.LOCAL:
                 target, reason = NavigationMode.HEALTHY, "global localization converged"
 

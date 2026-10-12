@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 from sensor_guard_nav.contracts import RecoveryAction, RecoveryEvidence, SensorHealth
@@ -15,6 +16,20 @@ class RecoveryGateConfig:
     local_ambiguity_max: float = 0.30
     global_prediction_error_max_m: float = 1.50
     global_ambiguity_max: float = 0.70
+
+    def __post_init__(self) -> None:
+        values = (
+            self.local_residual_max_m,
+            self.local_prediction_error_max_m,
+            self.global_prediction_error_max_m,
+        )
+        if self.healthy_frames_required <= 0 or not all(
+            math.isfinite(value) and value >= 0 for value in values
+        ):
+            raise ValueError("recovery frame count and error thresholds must be valid")
+        ambiguities = (self.local_ambiguity_max, self.global_ambiguity_max)
+        if not all(math.isfinite(value) and 0 <= value <= 1 for value in ambiguities):
+            raise ValueError("recovery ambiguity thresholds must be in [0, 1]")
 
 
 class RecoveryGate:
@@ -32,6 +47,8 @@ class RecoveryGate:
             evidence.predicted_pose_error_m,
             evidence.hypothesis_ambiguity,
         )
+        if not all(math.isfinite(value) for value in values):
+            raise ValueError("recovery evidence must be finite")
         if any(value < 0 for value in values) or evidence.hypothesis_ambiguity > 1:
             raise ValueError("recovery evidence must be non-negative and ambiguity in [0, 1]")
         if not health.healthy:

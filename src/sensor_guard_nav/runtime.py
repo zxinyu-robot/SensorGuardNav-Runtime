@@ -99,9 +99,7 @@ class SensorGuardRuntime:
         elif self._fault_started_s is None:
             self._fault_started_s = timestamp_s
         fault_duration = (
-            0.0
-            if self._fault_started_s is None
-            else max(0.0, timestamp_s - self._fault_started_s)
+            0.0 if self._fault_started_s is None else max(0.0, timestamp_s - self._fault_started_s)
         )
         context = replace(
             safety_context,

@@ -52,12 +52,11 @@ def _base_cloud(count: int) -> np.ndarray:
 def _context(phase: str, progress: float) -> SafetyContext:
     severe = phase == "severe_pollution"
     recovering = phase == "clean_recovery"
+    uncertainty = 0.08 if phase == "normal" else 0.25 + 0.45 * progress
+    if recovering:
+        uncertainty = max(0.05, 0.35 * (1.0 - progress))
     return SafetyContext(
-        localization_uncertainty_m=(
-            0.08 if phase == "normal" else 0.25 + 0.45 * progress
-        )
-        if not recovering
-        else max(0.05, 0.35 * (1.0 - progress)),
+        localization_uncertainty_m=uncertainty,
         obstacle_fov_fraction=0.10 if severe else (0.65 if phase != "normal" else 1.0),
         braking_deceleration_mps2=1.2,
         reaction_time_s=0.20,

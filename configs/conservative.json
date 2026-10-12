@@ -1,0 +1,45 @@
+{
+  "runtime": {
+    "expected_points": 360,
+    "expected_intensity": 1.0,
+    "angular_bins": 36
+  },
+  "trust": {
+    "quality_weight": 0.7,
+    "consistency_weight": 0.3,
+    "ema_alpha": 0.5,
+    "window_size": 4,
+    "bad_threshold": 0.62,
+    "good_threshold": 0.82,
+    "bad_frames_required": 2,
+    "good_frames_required": 6
+  },
+  "state_machine": {
+    "degraded_timeout_s": 4.0,
+    "local_recovery_settle_s": 2.0,
+    "global_recovery_timeout_s": 8.0
+  },
+  "safety": {
+    "nominal_speed_mps": 0.6,
+    "dead_reckoning_speed_mps": 0.12,
+    "uncertainty_stop_m": 0.6,
+    "minimum_fov_fraction": 0.4,
+    "obstacle_margin_m": 0.5,
+    "degraded_time_limit_s": 4.0,
+    "minimum_command_speed_mps": 0.04
+  },
+  "recovery": {
+    "healthy_frames_required": 8,
+    "local_residual_max_m": 0.12,
+    "local_prediction_error_max_m": 0.2,
+    "local_ambiguity_max": 0.2,
+    "global_prediction_error_max_m": 1.0,
+    "global_ambiguity_max": 0.5
+  },
+  "scenario": {
+    "normal_frames": 8,
+    "progressive_frames": 10,
+    "severe_frames": 8,
+    "recovery_frames": 24
+  }
+}

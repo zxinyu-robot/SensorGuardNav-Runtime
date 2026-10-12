@@ -73,8 +73,10 @@ class TrustArbiter:
         if not 0 <= raw <= 1:
             raise ValueError("input evidence scores must be in [0, 1]")
         self._samples.append(raw)
-        self._ema = raw if self._ema is None else (
-            self.config.ema_alpha * raw + (1 - self.config.ema_alpha) * self._ema
+        self._ema = (
+            raw
+            if self._ema is None
+            else (self.config.ema_alpha * raw + (1 - self.config.ema_alpha) * self._ema)
         )
         score = 0.5 * self._ema + 0.5 * (sum(self._samples) / len(self._samples))
 

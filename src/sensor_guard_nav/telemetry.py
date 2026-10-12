@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json
 from collections import Counter
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 from sensor_guard_nav.contracts import RuntimeDecision, to_jsonable
 
@@ -50,8 +50,7 @@ def write_summary(path: str | Path, decisions: Iterable[RuntimeDecision]) -> dic
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(
-        json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True, allow_nan=False)
-        + "\n",
+        json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True, allow_nan=False) + "\n",
         encoding="utf-8",
     )
     return summary

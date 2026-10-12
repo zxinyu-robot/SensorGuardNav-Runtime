@@ -26,9 +26,7 @@ def _fraction(value: float, name: str) -> None:
         raise ValueError(f"{name} must be finite and in [0, 1]")
 
 
-def point_dropout(
-    points: NDArray[np.floating], fraction: float, *, seed: int = 0
-) -> PointCloud:
+def point_dropout(points: NDArray[np.floating], fraction: float, *, seed: int = 0) -> PointCloud:
     """Remove an exact, seeded fraction of points."""
     cloud = _cloud(points)
     _fraction(fraction, "fraction")
@@ -51,9 +49,7 @@ def sector_occlusion(
     end = (end_angle_rad + math.pi) % (2 * math.pi) - math.pi
     angles = np.arctan2(cloud[:, 1], cloud[:, 0])
     inside = (
-        (angles >= start) & (angles <= end)
-        if start <= end
-        else (angles >= start) | (angles <= end)
+        (angles >= start) & (angles <= end) if start <= end else (angles >= start) | (angles <= end)
     )
     return cloud[~inside]
 
@@ -71,9 +67,7 @@ def range_bias(points: NDArray[np.floating], bias_m: float) -> PointCloud:
     return cloud
 
 
-def gaussian_noise(
-    points: NDArray[np.floating], sigma_m: float, *, seed: int = 0
-) -> PointCloud:
+def gaussian_noise(points: NDArray[np.floating], sigma_m: float, *, seed: int = 0) -> PointCloud:
     """Add seeded zero-mean Gaussian noise to finite xyz coordinates."""
     cloud = _cloud(points)
     if not math.isfinite(sigma_m) or sigma_m < 0:
@@ -84,9 +78,7 @@ def gaussian_noise(
     return cloud
 
 
-def intensity_attenuation(
-    points: NDArray[np.floating], factor: float
-) -> PointCloud:
+def intensity_attenuation(points: NDArray[np.floating], factor: float) -> PointCloud:
     """Multiply finite intensities by a factor in [0, 1]."""
     cloud = _cloud(points)
     _fraction(factor, "factor")
@@ -95,9 +87,7 @@ def intensity_attenuation(
     return cloud
 
 
-def nan_corruption(
-    points: NDArray[np.floating], fraction: float, *, seed: int = 0
-) -> PointCloud:
+def nan_corruption(points: NDArray[np.floating], fraction: float, *, seed: int = 0) -> PointCloud:
     """Replace all four fields for a seeded fraction of rows with NaN."""
     cloud = _cloud(points)
     _fraction(fraction, "fraction")

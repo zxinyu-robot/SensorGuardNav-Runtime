@@ -3,17 +3,17 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, is_dataclass
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import Any
 
 
-class SensorKind(str, Enum):
+class SensorKind(StrEnum):
     LIDAR = "lidar"
     IMU = "imu"
     WHEEL_ODOMETRY = "wheel_odometry"
 
 
-class FaultType(str, Enum):
+class FaultType(StrEnum):
     NONE = "none"
     DROPOUT = "dropout"
     OCCLUSION = "occlusion"
@@ -26,7 +26,7 @@ class FaultType(str, Enum):
     UNKNOWN = "unknown"
 
 
-class NavigationMode(str, Enum):
+class NavigationMode(StrEnum):
     HEALTHY = "healthy"
     SUSPECT = "suspect"
     DEGRADED_ODOMETRY = "degraded_odometry"
@@ -36,7 +36,7 @@ class NavigationMode(str, Enum):
     MANUAL_REQUIRED = "manual_required"
 
 
-class RecoveryAction(str, Enum):
+class RecoveryAction(StrEnum):
     WAIT = "wait"
     LOCAL = "local"
     GLOBAL = "global"
