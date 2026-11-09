@@ -1,3 +1,5 @@
+> **本仓库已并入 [legged-navigation-runtime](https://github.com/zxinyu-robot/legged-navigation-runtime)（目录 `python/sensor_guard_nav/`），此处只读归档，后续维护在新仓库进行。**
+
 # SensorGuard-NAV
 
 面向传感器污染与观测残缺场景的定位自救运行时中间件。首版聚焦 **LiDAR 污染 +
